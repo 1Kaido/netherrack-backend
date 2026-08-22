@@ -43,8 +43,7 @@ def google_callback():
 
         user = User(
             google_id=google_id,
-            email=email,
-            name=name
+            email=email
         )
 
         db.session.add(user)
