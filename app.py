@@ -18,12 +18,16 @@ import os
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
+
 #app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///local.db"
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 CORS(app)
 
-db.init_app(app)
 jwt = JWTManager(app)
 oauth.init_app(app)
 app.register_blueprint(auth_bp)
