@@ -1,0 +1,14 @@
+python-dotenv
+Flask
+Flask-Cors
+Flask-JWT-Extended
+Flask-SQLAlchemy
+Authlib
+strands-agents
+strands-agents-tools
+tavily-python
+beautifulsoup4
+requests
+openai
+psycopg2-binary
+ 
