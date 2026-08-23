@@ -31,7 +31,36 @@ model = OpenAIModel(
     },
 )
 
+# ------ New Stream Each User ------- #
+import queue
+import uuid
+from contextvars import ContextVar
 
+status_queues = {}
+
+current_research_id = ContextVar(
+    "current_research_id",
+    default=None
+)
+
+def create_research():
+    research_id = str(uuid.uuid4())
+    status_queues[research_id] = queue.Queue()
+    return research_id
+
+
+def emit_to_frontend(data):
+    research_id = current_research_id.get()
+
+    if not research_id:
+        return
+    q = status_queues.get(research_id)
+    if q:
+        q.put(data)
+
+def remove_research(research_id):
+    status_queues.pop(research_id, None)
+    
 @tool
 def tavily_search(query: str) -> str:
     "Search the web for current and relevant information"
@@ -40,7 +69,12 @@ def tavily_search(query: str) -> str:
         search_depth="basic",  # advanced
         max_results=5,  # fixed: was max_result (typo, silently ignored by Tavily)
     )
-    print("SEARCHING WEB..........")
+    emit_to_frontend({
+            "type": "tool",
+            "stage": "reading",
+            "message": "Reading webpage",
+            "url": None
+        })
     return result
 
 
@@ -49,6 +83,12 @@ def fetch_page(url: str) -> str:
     """
     Fetch web page and extract its readable text
     """
+    emit_to_frontend({
+            "type": "tool",
+            "stage": "reading",
+            "message": "Reading webpage",
+            "url": url
+        })
     try:
         response = requests.get(
             url, timeout=20,
@@ -59,18 +99,10 @@ def fetch_page(url: str) -> str:
         for tag in soup(["script", "style", "noscript"]):
             tag.decompose()
         text = soup.get_text(" ", strip=True)
-        print("FETCHING PAGE...........")
         return text[:6000]  # Set on 5000+ just testing that's why
     except Exception as e:
         logging.error(f"Error fetching Page :{e}")
         raise
-
-
-status_callback = None
-
-def emit_to_frontend(data):
-    if status_callback:
-        status_callback(data)
 
 @tool
 def update_status(
@@ -79,13 +111,14 @@ def update_status(
     url: str = ""
 ):
     """
-    Send a live progress update to the frontend.
+    Send a live progress update to the current user.
 
     Args:
         message: Short user-visible description.
         stage: Current stage.
-        url: URL currently being searched or read, if applicable.
+        url: Related URL if available.
     """
+
     emit_to_frontend({
         "type": "agent_status",
         "stage": stage,
@@ -95,6 +128,8 @@ def update_status(
 
     return "Status sent successfully."
 
+
+
  
 
 researcher = Agent(
@@ -103,11 +138,3 @@ researcher = Agent(
     tools=[tavily_search, fetch_page, file_write, file_read, file_editor,update_status],
 )
 
-
-if __name__ == "__main__":
-    today = date.today().strftime("%B %d, %Y")
-    prompt = "How to become Rich?"
-    response = researcher(
-        f"Today's date is {today} your task is {prompt}"
-    )
-    print(response)
