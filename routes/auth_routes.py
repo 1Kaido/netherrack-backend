@@ -8,7 +8,7 @@ from models import User, db
 
 auth_bp = Blueprint("auth", __name__)
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:5500")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://thenetherrack.vercel.app")
 
 
 @auth_bp.route("/auth/google")
