@@ -1,10 +1,10 @@
-from dotenv import load_dotenv  # type: ignore[reportMissingImports]
+from dotenv import load_dotenv 
 load_dotenv()
 
 from datetime import date
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # type: ignore[reportMissingImports]
-from flask_jwt_extended import (  # type: ignore[reportMissingImports]
+from flask_cors import CORS  
+from flask_jwt_extended import (  
     JWTManager,
     jwt_required,
     get_jwt_identity,
@@ -26,6 +26,7 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 #app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///local.db"
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+db.init_app(app)
 CORS(app)
 
 jwt = JWTManager(app)
@@ -62,7 +63,7 @@ def user_prompt():
     result = researcher(f"Today's date is {today} your task is {prompt}")
 
     return jsonify({
-        "success": True
+        "success": True,
         "result": str(result)
     })
 
