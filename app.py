@@ -114,21 +114,39 @@ def user_prompt():
             "error": "No prompt sent"
         }), 400
 
-    print("User:", user_id)
-    print("Prompt:", prompt)
+    print(
+        f"[RESEARCH REQUEST] User={user_id} "
+        f"Prompt={prompt}",
+        flush=True
+    )
 
-    # Create a unique queue/session
+    # Create unique research session
     research_id = create_research()
+
+    print(
+        f"[{research_id}] RESEARCH SESSION CREATED",
+        flush=True
+    )
 
     def run_agent():
 
         # Bind this thread to this research session
         token = current_research_id.set(research_id)
 
+        print(
+            f"[{research_id}] AGENT STARTED",
+            flush=True
+        )
+
         try:
 
             today = date.today().strftime(
                 "%B %d, %Y"
+            )
+
+            print(
+                f"[{research_id}] TODAY={today}",
+                flush=True
             )
 
             result = researcher(
@@ -140,10 +158,21 @@ User's task:
 """
             )
 
+            print(
+                f"[{research_id}] AGENT FINISHED",
+                flush=True
+            )
+
             # Get this research's queue
             q = status_queues.get(research_id)
 
             if q:
+
+                print(
+                    f"[{research_id}] SENDING DONE EVENT",
+                    flush=True
+                )
+
                 q.put({
                     "type": "done",
                     "stage": "done",
@@ -151,26 +180,49 @@ User's task:
                     "result": str(result)
                 })
 
+            else:
+
+                print(
+                    f"[{research_id}] WARNING: "
+                    f"QUEUE NOT FOUND AFTER AGENT FINISHED",
+                    flush=True
+                )
+
         except Exception as e:
 
             print(
-                f"Research error [{research_id}]:",
-                e
+                f"[{research_id}] RESEARCH ERROR: "
+                f"{repr(e)}",
+                flush=True
             )
 
             q = status_queues.get(research_id)
 
             if q:
+
                 q.put({
                     "type": "error",
                     "stage": "error",
                     "message": str(e)
                 })
 
+            else:
+
+                print(
+                    f"[{research_id}] WARNING: "
+                    f"QUEUE NOT FOUND WHILE HANDLING ERROR",
+                    flush=True
+                )
+
         finally:
 
             # Remove ContextVar from this thread
             current_research_id.reset(token)
+
+            print(
+                f"[{research_id}] AGENT THREAD FINISHED",
+                flush=True
+            )
 
     # Run agent in background
     Thread(
@@ -193,22 +245,49 @@ User's task:
 @jwt_required()
 def research_stream(research_id):
 
+    print(
+        f"[{research_id}] SSE CONNECTION REQUESTED",
+        flush=True
+    )
+
     q = status_queues.get(research_id)
 
     if q is None:
+
+        print(
+            f"[{research_id}] SSE ERROR: "
+            f"RESEARCH SESSION NOT FOUND",
+            flush=True
+        )
+
         return jsonify({
             "success": False,
             "error": "Research session not found"
         }), 404
 
+    print(
+        f"[{research_id}] SSE CONNECTION ACCEPTED",
+        flush=True
+    )
+
     def generate():
+
+        print(
+            f"[{research_id}] SSE GENERATOR STARTED",
+            flush=True
+        )
 
         while True:
 
             try:
 
-                event = q.get(
-                    timeout=30
+                # Wait for an event
+                event = q.get(timeout=10)
+
+                print(
+                    f"[{research_id}] SSE EVENT: "
+                    f"{event.get('type')}",
+                    flush=True
                 )
 
                 yield (
@@ -217,17 +296,54 @@ def research_stream(research_id):
                     f"\n\n"
                 )
 
-                # End stream
+                # End stream only after terminal event
                 if event.get("type") in (
                     "done",
                     "error"
                 ):
+
+                    print(
+                        f"[{research_id}] "
+                        f"SSE TERMINAL EVENT RECEIVED",
+                        flush=True
+                    )
+
                     break
 
             except queue.Empty:
 
-                # Keep connection alive
+                # Keep SSE connection alive
+                print(
+                    f"[{research_id}] SSE HEARTBEAT",
+                    flush=True
+                )
+
                 yield ": heartbeat\n\n"
+
+            except GeneratorExit:
+
+                print(
+                    f"[{research_id}] "
+                    f"SSE CLIENT DISCONNECTED",
+                    flush=True
+                )
+
+                break
+
+            except Exception as e:
+
+                print(
+                    f"[{research_id}] "
+                    f"SSE GENERATOR ERROR: {repr(e)}",
+                    flush=True
+                )
+
+                break
+
+        print(
+            f"[{research_id}] SSE GENERATOR FINISHED",
+            flush=True
+        )
 
     return Response(
         stream_with_context(
