@@ -66,11 +66,41 @@ def fetch_page(url: str) -> str:
         raise
 
 
-# This is what app.py imports: `from agent import researcher`
+status_callback = None
+
+def emit_to_frontend(data):
+    if status_callback:
+        status_callback(data)
+
+@tool
+def update_status(
+    message: str,
+    stage: str = "working",
+    url: str = ""
+):
+    """
+    Send a live progress update to the frontend.
+
+    Args:
+        message: Short user-visible description.
+        stage: Current stage.
+        url: URL currently being searched or read, if applicable.
+    """
+    emit_to_frontend({
+        "type": "agent_status",
+        "stage": stage,
+        "message": message,
+        "url": url or None
+    })
+
+    return "Status sent successfully."
+
+ 
+
 researcher = Agent(
     model=model,
     system_prompt=researcher_prompt,
-    tools=[tavily_search, fetch_page, file_write, file_read, file_editor],
+    tools=[tavily_search, fetch_page, file_write, file_read, file_editor,update_status],
 )
 
 
