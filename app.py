@@ -12,7 +12,7 @@ from flask_jwt_extended import (  # type: ignore[reportMissingImports]
 from routes.auth_routes import auth_bp
 from extensions import oauth
 from models import db
-#from agent import researcher
+from agent import researcher
 import os
 
 
@@ -59,11 +59,11 @@ def user_prompt():
     print("Prompt:", prompt)
 
     today = date.today().strftime("%B %d, %Y")
-   # result = researcher(f"Today's date is {today} your task is {prompt}")
+    result = researcher(f"Today's date is {today} your task is {prompt}")
 
     return jsonify({
         "success": True
-       # "result": str(result)
+        "result": str(result)
     })
 
 
