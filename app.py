@@ -190,6 +190,7 @@ User's task:
 # =========================================================
 
 @app.route("/research/stream/<research_id>")
+@jwt_required()
 def research_stream(research_id):
 
     q = status_queues.get(research_id)
