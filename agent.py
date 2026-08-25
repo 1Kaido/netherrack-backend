@@ -35,7 +35,7 @@ def models(model_id):
         },
     )
     return model
-"""
+
 # ------ New Stream Each User ------- #
 import queue
 import uuid
@@ -65,7 +65,7 @@ def emit_to_frontend(data):
 
 def remove_research(research_id):
     status_queues.pop(research_id, None)
-"""
+
 @tool
 def tavily_search(query: str) -> str:
     "Search the web for current and relevant information"
@@ -74,14 +74,13 @@ def tavily_search(query: str) -> str:
         search_depth="basic",  # advanced
         max_results=5,  # fixed: was max_result (typo, silently ignored by Tavily)
     )
-    """
     emit_to_frontend({
             "type": "tool",
             "stage": "reading",
             "message": "Reading webpage",
             "url": None
         })
-    """
+
     return result
 
 @tool
@@ -89,14 +88,13 @@ def fetch_page(url: str) -> str:
     """
     Fetch web page and extract its readable text
     """
-    """
     emit_to_frontend({
             "type": "tool",
             "stage": "reading",
             "message": "Reading webpage",
             "url": url
         })
-    """
+ 
     
     try:
         response = requests.get(
@@ -112,21 +110,21 @@ def fetch_page(url: str) -> str:
     except Exception as e:
         logging.error(f"Error fetching Page :{e}")
         raise
-"""
+
 @tool
 def update_status(
     message: str,
     stage: str = "working",
     url: str = ""
 ):
-    
+    """
     Send a live progress update to the current user.
 
     Args:
         message: Short user-visible description.
         stage: Current stage.
         url: Related URL if available.
-    
+    """
     
     emit_to_frontend({
         "type": "agent_status",
@@ -135,8 +133,7 @@ def update_status(
         "url": url or None
     })
     
-    return "Status sent successfully." 
-"""  
+    return "Status sent successfully."  
 
 #======================================================================================#
 
