@@ -11,12 +11,19 @@ PROMPTS = {
     "diamond": DIAMOND_PROMPT,
     "netherite": NETHERITE_PROMPT,
 }
-
+"""
 MODELS = {
     "stone": "qwen/qwen3-8b",
     "iron": "qwen/qwen3-30b-a3b",
     "diamond": "qwen/qwen3-235b-a22b",
     "netherite": "openai/gpt-5.6-sol",
+}
+"""
+MODELS = {
+    "stone": "llama-3.1-8b-instant",
+    "iron": "llama-3.1-8b-instant",
+    "diamond": "llama-3.1-8b-instant",
+    "netherite": "llama-3.3-70b-versatile",
 }
 
 MODEL_CONFIG = {
