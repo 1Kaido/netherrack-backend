@@ -85,6 +85,7 @@ def user_prompt():
     data = request.get_json(silent=True) or {}
     prompt = data.get("prompt")
     tier = data.get("tier", "stone")
+    print("tier is: " + str(tier))
     if not prompt:
         return jsonify({
             "success": False,
