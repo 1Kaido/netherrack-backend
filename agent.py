@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from strands_tools import file_read, file_write
 from strands.vended_tools import file_editor
-from strands.models.openai import OpenAIModel
+from strands.models.openai_responses import OpenAIResponsesModel
 from prompts.__init__ import MODEL_CONFIG, PROMPTS,MODELS
 load_dotenv()
 
@@ -23,7 +23,7 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 #Netherite -> Level IV
 
 def models(model_id,tier):
-    return OpenAIModel(
+    return OpenAIResponsesModel(
         client_args={
             "api_key": os.getenv("OPENROUTER_API_KEY"),
             "base_url": OPENROUTER_BASE_URL,
@@ -31,7 +31,7 @@ def models(model_id,tier):
         model_id=model_id,
         params={
             "temperature": MODEL_CONFIG[tier]["temperature"],
-            "max_tokens": MODEL_CONFIG[tier]["max_tokens"],
+            "max_output_tokens": MODEL_CONFIG[tier]["max_tokens"],
         },
     )
   
