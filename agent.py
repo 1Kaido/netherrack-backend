@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from strands_tools import file_read, file_write
 from strands.vended_tools import file_editor
+from strands.models.groq import GroqModel
 from strands.models.openai_responses import OpenAIResponsesModel
 from prompts.__init__ import MODEL_CONFIG, PROMPTS,MODELS
 load_dotenv()
@@ -21,7 +22,7 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 #Iron -> Level II
 #Dimonds -> Level III
 #Netherite -> Level IV
-
+"""
 def models(model_id,tier):
     return OpenAIResponsesModel(
         client_args={
@@ -34,8 +35,19 @@ def models(model_id,tier):
             "max_output_tokens": MODEL_CONFIG[tier]["max_tokens"],
         },
     )
-  
-  
+"""
+def groq_model(model_id, tier):
+    return GroqModel(
+        client_args={
+            "api_key": os.getenv("GROQ_API_KEY"),
+        },
+        model_id=model_id,
+        params={
+            "temperature": MODEL_CONFIG[tier]["temperature"],
+            "max_tokens": MODEL_CONFIG[tier]["max_tokens"],
+        },
+    )
+
 
 # ------ New Stream Each User ------- #
 import queue
@@ -143,13 +155,18 @@ def update_status(
 #======================================================================================#
 
 TOOL = [tavily_search, fetch_page, file_write, file_read, file_editor,update_status]
+"""
 def create_researcher_on_tier(tier):
     return Agent(
         model=models(MODELS[tier], tier),
         system_prompt=PROMPTS[tier],
         tools=TOOL
     )
-   
+"""
 
-
-
+def create_researcher_on_tier(tier):
+    return Agent(
+        model=groq_model(MODELS[tier], tier),
+        system_prompt=PROMPTS[tier],
+        tools=TOOL
+    )
