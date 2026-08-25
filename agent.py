@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from strands_tools import file_read, file_write
 from strands.vended_tools import file_editor
 from strands.models.openai import OpenAIModel
-from prompts.__init__ import PROMPTS,MODELS
+from prompts.__init__ import MODEL_CONFIG, PROMPTS,MODELS
 load_dotenv()
 
 os.environ["BYPASS_TOOL_CONSENT"] = "true"
@@ -22,19 +22,20 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 #Dimonds -> Level III
 #Netherite -> Level IV
 
-def models(model_id):
-    model = OpenAIModel(
+def models(model_id,tier):
+    return OpenAIModel(
         client_args={
             "api_key": os.getenv("OPENROUTER_API_KEY"),
             "base_url": OPENROUTER_BASE_URL,
         },
         model_id=model_id,
         params={
-            "temperature": 0.7,
-            "max_tokens": 2000,
+            "temperature": MODEL_CONFIG[tier]["temperature"],
+            "max_tokens": MODEL_CONFIG[tier]["max_tokens"],
         },
     )
-    return model
+  
+  
 
 # ------ New Stream Each User ------- #
 import queue
@@ -141,14 +142,14 @@ def update_status(
 
 #======================================================================================#
 
-TOOL = [tavily_search, fetch_page, file_write, file_read, file_editor]#ADD UPADTE_STATUS
+TOOL = [tavily_search, fetch_page, file_write, file_read, file_editor,update_status]
 def create_researcher_on_tier(tier):
-    model = Agent(
-        model=models(MODELS[tier]),
+    return Agent(
+        model=models(MODELS[tier], tier),
         system_prompt=PROMPTS[tier],
         tools=TOOL
     )
-    return model
+   
 
 
 

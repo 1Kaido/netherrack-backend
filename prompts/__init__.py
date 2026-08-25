@@ -18,3 +18,25 @@ MODELS = {
     "diamond": "qwen/qwen3-235b-a22b",
     "netherite": "openai/gpt-5.6-sol",
 }
+
+MODEL_CONFIG = {
+    "stone": {
+        "temperature": 0.2,
+        "max_tokens": 1200,
+    },
+
+    "iron": {
+        "temperature": 0.3,
+        "max_tokens": 2000,
+    },
+
+    "diamond": {
+        "temperature": 0.2,
+        "max_tokens": 3000,
+    },
+
+    "netherite": {
+        "temperature": 0.2,
+        "max_tokens": 5000,
+    },
+}
