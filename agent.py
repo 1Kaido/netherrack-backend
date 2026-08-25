@@ -9,8 +9,7 @@ from dotenv import load_dotenv
 from strands_tools import file_read, file_write
 from strands.vended_tools import file_editor
 from strands.models.openai import OpenAIModel
-from prompts import researcher_prompt
-
+from prompts.__init__ import PROMPTS,MODELS
 load_dotenv()
 
 os.environ["BYPASS_TOOL_CONSENT"] = "true"
@@ -23,10 +22,10 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 #Dimonds -> Level III
 #Netherite -> Level IV
 
-def models(url,model_id):
-    models = OpenAIModel(
+def models(model_id):
+    model = OpenAIModel(
         client_args={
-            "api_key": os.getenv("OPENROUTER_API_KEY"),
+            "api_key": os.getenv("OPENROUTER_API_KEY")
             "base_url": OPENROUTER_BASE_URL,
         },
         model_id=model_id,
@@ -35,7 +34,8 @@ def models(url,model_id):
             "max_tokens": 2000,
         },
     )
-
+    return model
+"""
 # ------ New Stream Each User ------- #
 import queue
 import uuid
@@ -65,7 +65,7 @@ def emit_to_frontend(data):
 
 def remove_research(research_id):
     status_queues.pop(research_id, None)
-    
+"""
 @tool
 def tavily_search(query: str) -> str:
     "Search the web for current and relevant information"
@@ -74,19 +74,21 @@ def tavily_search(query: str) -> str:
         search_depth="basic",  # advanced
         max_results=5,  # fixed: was max_result (typo, silently ignored by Tavily)
     )
+    """
     emit_to_frontend({
             "type": "tool",
             "stage": "reading",
             "message": "Reading webpage",
             "url": None
         })
+    """
     return result
-
 
 @tool
 def fetch_page(url: str) -> str:
     """
     Fetch web page and extract its readable text
+    """
     """
     emit_to_frontend({
             "type": "tool",
@@ -94,6 +96,8 @@ def fetch_page(url: str) -> str:
             "message": "Reading webpage",
             "url": url
         })
+    """
+    
     try:
         response = requests.get(
             url, timeout=20,
@@ -108,31 +112,31 @@ def fetch_page(url: str) -> str:
     except Exception as e:
         logging.error(f"Error fetching Page :{e}")
         raise
-
+"""
 @tool
 def update_status(
     message: str,
     stage: str = "working",
     url: str = ""
 ):
-    """
+    
     Send a live progress update to the current user.
 
     Args:
         message: Short user-visible description.
         stage: Current stage.
         url: Related URL if available.
-    """
-
+    
+    
     emit_to_frontend({
         "type": "agent_status",
         "stage": stage,
         "message": message,
         "url": url or None
     })
-
-    return "Status sent successfully."
-
+    
+    return "Status sent successfully." 
+"""  
 
 #======================================================================================#
 
@@ -140,26 +144,13 @@ def update_status(
 
 #======================================================================================#
 
-MODELS = {
-    "stone": "qwen/qwen3-8b",
-    "iron": "qwen/qwen3-30b-a3b",
-    "diamond": "qwen/qwen3-235b-a22b",
-    "netherite": "openai/gpt-5.6-sol",
-}
-TOOL = [tavily_search, fetch_page, file_write, file_read, file_editor,update_status]
+TOOL = [tavily_search, fetch_page, file_write, file_read, file_editor]#ADD UPADTE_STATUS
+def create_researcher(tier):
+    model = Agent(
+        model=models(MODELS[tier]),
+        system_prompt=PROMPTS[tier],
+        tools=TOOL
+    )
+    return model
 
-stone = Agent(
-    model=models["stone"],
-    system_prompt=researcher_prompt,
-    tools=TOOL,
-)
-
-
- 
-
-researcher = Agent(
-    model=model,
-    system_prompt=researcher_prompt,
-    tools=[tavily_search, fetch_page, file_write, file_read, file_editor,update_status],
-)
 

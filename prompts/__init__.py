@@ -11,3 +11,10 @@ PROMPTS = {
     "diamond": DIAMOND_PROMPT,
     "netherite": NETHERITE_PROMPT,
 }
+
+MODELS = {
+    "stone": "qwen/qwen3-8b",
+    "iron": "qwen/qwen3-30b-a3b",
+    "diamond": "qwen/qwen3-235b-a22b",
+    "netherite": "openai/gpt-5.6-sol",
+}
