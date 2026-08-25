@@ -1,12 +1,10 @@
 from dotenv import load_dotenv
 load_dotenv()
-from agent import create_researcher
 from datetime import date
 import os
 import json
 import queue
 from threading import Thread
-
 from flask import (
     Flask,
     request,
@@ -14,27 +12,21 @@ from flask import (
     Response,
     stream_with_context,
 )
-
 from flask_cors import CORS
-
 from flask_jwt_extended import (
     JWTManager,
     jwt_required,
     get_jwt_identity,
 )
-
 from routes.auth_routes import auth_bp
 from extensions import oauth
 from models import db
-
 from agent import (
-    researcher,
+    create_researcher_on_tier,
     create_research,
     status_queues,
     current_research_id,
 )
-
-
 # =========================================================
 # FLASK APP
 # =========================================================
@@ -123,7 +115,7 @@ def user_prompt():
                 f"[{research_id}] TODAY={today}",
                 flush=True
             )
-            researcher = create_researcher("stone")
+            researcher = create_researcher_on_tier("stone")
             result = researcher(
             f"""
             Today's date is {today}.

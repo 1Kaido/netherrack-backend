@@ -145,12 +145,13 @@ def update_status(
 #======================================================================================#
 
 TOOL = [tavily_search, fetch_page, file_write, file_read, file_editor]#ADD UPADTE_STATUS
-def create_researcher(tier):
+def create_researcher_on_tier(tier):
     model = Agent(
         model=models(MODELS[tier]),
         system_prompt=PROMPTS[tier],
         tools=TOOL
     )
     return model
+
 
 
