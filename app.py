@@ -84,6 +84,7 @@ def user_prompt():
     user_id = get_jwt_identity()
     data = request.get_json(silent=True) or {}
     prompt = data.get("prompt")
+    tier = data.get("tier", "stone")
     if not prompt:
         return jsonify({
             "success": False,
@@ -115,7 +116,7 @@ def user_prompt():
                 f"[{research_id}] TODAY={today}",
                 flush=True
             )
-            researcher = create_researcher_on_tier("stone")
+            researcher = create_researcher_on_tier(tier)
             result = researcher(
             f"""
             Today's date is {today}.
