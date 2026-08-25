@@ -6,7 +6,6 @@ import os
 from tavily import TavilyClient
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-
 from strands_tools import file_read, file_write
 from strands.vended_tools import file_editor
 from strands.models.openai import OpenAIModel
@@ -18,18 +17,24 @@ os.environ["BYPASS_TOOL_CONSENT"] = "true"
 tavily = TavilyClient(
     api_key=os.getenv("TAVILY_API_KEY")
 )
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+#Stone -> Level I
+#Iron -> Level II
+#Dimonds -> Level III
+#Netherite -> Level IV
 
-model = OpenAIModel(
-    client_args={
-        "api_key": os.getenv("OPENROUTER_API_KEY"),
-        "base_url": "https://openrouter.ai/api/v1",
-    },
-    model_id="deepseek/deepseek-v4-flash-0731",
-    params={
-        "temperature": 0.7,
-        "max_tokens": 2000,
-    },
-)
+def models(url,model_id):
+    models = OpenAIModel(
+        client_args={
+            "api_key": os.getenv("OPENROUTER_API_KEY"),
+            "base_url": OPENROUTER_BASE_URL,
+        },
+        model_id=model_id,
+        params={
+            "temperature": 0.7,
+            "max_tokens": 2000,
+        },
+    )
 
 # ------ New Stream Each User ------- #
 import queue
@@ -128,6 +133,26 @@ def update_status(
 
     return "Status sent successfully."
 
+
+#======================================================================================#
+
+############# TIER TO TIER MODELS ##############
+
+#======================================================================================#
+
+MODELS = {
+    "stone": "qwen/qwen3-8b",
+    "iron": "qwen/qwen3-30b-a3b",
+    "diamond": "qwen/qwen3-235b-a22b",
+    "netherite": "openai/gpt-5.6-sol",
+}
+TOOL = [tavily_search, fetch_page, file_write, file_read, file_editor,update_status]
+
+stone = Agent(
+    model=models["stone"],
+    system_prompt=researcher_prompt,
+    tools=TOOL,
+)
 
 
  
