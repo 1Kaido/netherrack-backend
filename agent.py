@@ -8,7 +8,6 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from strands_tools import file_read, file_write
 from strands.vended_tools import file_editor
-from strands.models.groq import GroqModel
 from strands.models.openai_responses import OpenAIResponsesModel
 from prompts.__init__ import MODEL_CONFIG, PROMPTS,MODELS
 load_dotenv()
@@ -36,18 +35,20 @@ def models(model_id,tier):
         },
     )
 """
-def groq_model(model_id, tier):
-    return GroqModel(
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+
+def models(model_id, tier):
+    return OpenAIResponsesModel(
         client_args={
             "api_key": os.getenv("GROQ_API_KEY"),
+            "base_url": GROQ_BASE_URL,
         },
         model_id=model_id,
         params={
             "temperature": MODEL_CONFIG[tier]["temperature"],
-            "max_tokens": MODEL_CONFIG[tier]["max_tokens"],
+            "max_output_tokens": MODEL_CONFIG[tier]["max_tokens"],
         },
     )
-
 
 # ------ New Stream Each User ------- #
 import queue
@@ -166,7 +167,7 @@ def create_researcher_on_tier(tier):
 
 def create_researcher_on_tier(tier):
     return Agent(
-        model=groq_model(MODELS[tier], tier),
+        model=models(MODELS[tier], tier),
         system_prompt=PROMPTS[tier],
         tools=TOOL
     )
