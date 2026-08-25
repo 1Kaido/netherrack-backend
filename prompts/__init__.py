@@ -19,9 +19,10 @@ MODELS = {
     "netherite": "openai/gpt-5.6-sol",
 }
 """
+
 MODELS = {
-    "stone": "openai/gpt-oss-20b",
-    "iron": "openai/gpt-oss-20b",
+    "stone": "allam-2-7b",
+    "iron": "allam-2-7b",
     "diamond": "openai/gpt-oss-20b",
     "netherite": "openai/gpt-oss-20b",
 }
