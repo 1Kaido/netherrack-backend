@@ -18,3 +18,6 @@ strands-agents[openai]
 strands-agents-tools
 strands-agents[openai]==1.50.2
 strands-agents-tools
+strands-agents
+groq
+
