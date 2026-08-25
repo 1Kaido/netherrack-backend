@@ -14,7 +14,7 @@ load_dotenv()
 
 os.environ["BYPASS_TOOL_CONSENT"] = "true"
 tavily = TavilyClient(
-    api_key=os.getenv("TAVILY_API_KEY")
+    api_key=os.getenv("TAVILY_API_KEY"),
 )
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 #Stone -> Level I
@@ -25,7 +25,7 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 def models(model_id):
     model = OpenAIModel(
         client_args={
-            "api_key": os.getenv("OPENROUTER_API_KEY")
+            "api_key": os.getenv("OPENROUTER_API_KEY"),
             "base_url": OPENROUTER_BASE_URL,
         },
         model_id=model_id,
