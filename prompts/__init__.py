@@ -20,10 +20,10 @@ MODELS = {
 }
 """
 MODELS = {
-    "stone": "llama-3.1-8b-instant",
-    "iron": "llama-3.1-8b-instant",
-    "diamond": "llama-3.1-8b-instant",
-    "netherite": "llama-3.3-70b-versatile",
+    "stone": "openai/gpt-oss-20b",
+    "iron": "openai/gpt-oss-20b",
+    "diamond": "openai/gpt-oss-20b",
+    "netherite": "openai/gpt-oss-20b",
 }
 
 MODEL_CONFIG = {
