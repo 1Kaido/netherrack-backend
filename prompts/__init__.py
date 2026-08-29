@@ -11,13 +11,15 @@ PROMPTS = {
     "diamond": DIAMOND_PROMPT,
     "netherite": NETHERITE_PROMPT,
 }
-"""
+
+
 MODELS = {
     "stone": "qwen/qwen3-8b",
     "iron": "qwen/qwen3-30b-a3b",
-    "diamond": "qwen/qwen3-235b-a22b",
+    "diamond": "deepseek/deepseek-v3.2",
     "netherite": "openai/gpt-5.6-sol",
 }
+
 """
 
 MODELS = {
@@ -26,6 +28,7 @@ MODELS = {
     "diamond": "openai/gpt-oss-20b",
     "netherite": "openai/gpt-oss-20b",
 }
+"""
 
 MODEL_CONFIG = {
     "stone": {
