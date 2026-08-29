@@ -33,21 +33,25 @@ MODELS = {
 MODEL_CONFIG = {
     "stone": {
         "temperature": 0.2,
+        "max_tool_calls": 5,
         "max_tokens": 1200,
     },
 
     "iron": {
         "temperature": 0.3,
+        "max_tool_calls": 10,
         "max_tokens": 2000,
     },
 
     "diamond": {
         "temperature": 0.2,
+        "max_tool_calls": 17,
         "max_tokens": 3000,
     },
 
     "netherite": {
         "temperature": 0.2,
+        "max_tool_calls": 24,
         "max_tokens": 5000,
     },
 }
