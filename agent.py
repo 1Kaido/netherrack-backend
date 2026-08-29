@@ -21,7 +21,7 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 #Iron -> Level II
 #Dimonds -> Level III
 #Netherite -> Level IV
-"""
+
 def models(model_id,tier):
     return OpenAIResponsesModel(
         client_args={
@@ -34,6 +34,7 @@ def models(model_id,tier):
             "max_output_tokens": MODEL_CONFIG[tier]["max_tokens"],
         },
     )
+
 """
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
@@ -49,7 +50,7 @@ def models(model_id, tier):
             "max_output_tokens": MODEL_CONFIG[tier]["max_tokens"],
         },
     )
-
+"""
 # ------ New Stream Each User ------- #
 import queue
 import uuid
@@ -156,13 +157,15 @@ def update_status(
 #======================================================================================#
 
 TOOL = [tavily_search, fetch_page, file_write, file_read, file_editor,update_status]
-"""
+
 def create_researcher_on_tier(tier):
     return Agent(
         model=models(MODELS[tier], tier),
         system_prompt=PROMPTS[tier],
         tools=TOOL
     )
+
+
 """
 
 def create_researcher_on_tier(tier):
@@ -171,3 +174,4 @@ def create_researcher_on_tier(tier):
         system_prompt=PROMPTS[tier],
         tools=TOOL
     )
+"""
