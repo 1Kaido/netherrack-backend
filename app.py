@@ -51,7 +51,7 @@ CORS(app)
 jwt = JWTManager(app)
 oauth.init_app(app)
 app.register_blueprint(auth_bp)
-
+app.register_blueprint(sse_bp, url_prefix="/api")
 with app.app_context():
     db.create_all()
     
