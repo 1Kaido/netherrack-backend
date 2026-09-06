@@ -12,7 +12,7 @@ def getUser():
     user_id = get_jwt_identity()
     return f"user:{user_id}"
     
-@see_bp.route("/stream")
+@sse_bp.route("/stream")
 @jwt_required()
 def stream():
     user_id = getUser()
