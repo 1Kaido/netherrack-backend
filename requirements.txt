@@ -9,6 +9,7 @@ python-dotenv==1.2.3
 requests==2.32.3
 PyJWT==2.13.0
 itsdangerous==2.2.0
+redis
 Jinja2==3.1.6
 MarkupSafe==3.0.3
 Werkzeug==3.1.3
