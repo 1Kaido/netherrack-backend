@@ -21,6 +21,7 @@ os.environ["BYPASS_TOOL_CONSENT"] = "true"
 tavily = TavilyClient(
     api_key=os.getenv("TAVILY_API_KEY"),
 )
+"""
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 def models(model_id,tier):
@@ -51,7 +52,7 @@ def models(model_id, tier):
             "max_output_tokens": MODEL_CONFIG[tier]["max_tokens"],
         },
     )
-"""
+
 def send_to_frontend(data):
     user_id = getUser()
     redis_client.xadd(
