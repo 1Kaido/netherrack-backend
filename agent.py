@@ -1,4 +1,5 @@
 import requests
+import json
 from datetime import date
 from strands import Agent, tool
 import logging
@@ -12,15 +13,15 @@ from strands.models.openai_responses import OpenAIResponsesModel
 from prompts.__init__ import MODEL_CONFIG, PROMPTS,MODELS
 load_dotenv()
 
+########### SSE IMPORTS ###########
+from sse.routes import getUser
+from sse.redis_client import redis_client
+
 os.environ["BYPASS_TOOL_CONSENT"] = "true"
 tavily = TavilyClient(
     api_key=os.getenv("TAVILY_API_KEY"),
 )
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-#Stone -> Level I
-#Iron -> Level II
-#Dimonds -> Level III
-#Netherite -> Level IV
 
 def models(model_id,tier):
     return OpenAIResponsesModel(
@@ -51,36 +52,17 @@ def models(model_id, tier):
         },
     )
 """
-# ------ New Stream Each User ------- #
-import queue
-import uuid
-from contextvars import ContextVar
-
-status_queues = {}
-
-current_research_id = ContextVar(
-    "current_research_id",
-    default=None
-)
-
-def create_research():
-    research_id = str(uuid.uuid4())
-    status_queues[research_id] = queue.Queue()
-    return research_id
-
-
-def emit_to_frontend(data):
-    research_id = current_research_id.get()
-
-    if not research_id:
-        return
-    q = status_queues.get(research_id)
-    if q:
-        q.put(data)
-
-def remove_research(research_id):
-    status_queues.pop(research_id, None)
-
+def send_to_frontend(data):
+    user_id = getUser()
+    redis_client.xadd(
+            user_id,
+            {
+                "message": json.dumps(data)
+            }
+        )
+    
+    
+    
 @tool
 def tavily_search(query: str) -> str:
     "Search the web for current and relevant information"
@@ -89,13 +71,12 @@ def tavily_search(query: str) -> str:
         search_depth="basic",  # advanced
         max_results=5,  # fixed: was max_result (typo, silently ignored by Tavily)
     )
-    emit_to_frontend({
-            "type": "tool",
-            "stage": "reading",
-            "message": "Reading webpage",
-            "url": None
-        })
-
+    send_to_frontend({
+        "type": "tool",
+        "stage": "searching",
+        "message": "Searching Webpage",
+        "url": None
+    })
     return result
 
 @tool
@@ -103,13 +84,12 @@ def fetch_page(url: str) -> str:
     """
     Fetch web page and extract its readable text
     """
-    emit_to_frontend({
-            "type": "tool",
-            "stage": "reading",
-            "message": "Reading webpage",
-            "url": url
-        })
- 
+    send_to_frontend({
+        "type": "tool",
+        "stage": "reading",
+        "message": "Reading Webpage",
+        "url": url
+    }) 
     
     try:
         response = requests.get(
@@ -125,6 +105,7 @@ def fetch_page(url: str) -> str:
     except Exception as e:
         logging.error(f"Error fetching Page :{e}")
         raise
+        
 
 @tool
 def update_status(
@@ -141,20 +122,16 @@ def update_status(
         url: Related URL if available.
     """
     
-    emit_to_frontend({
+    send_to_frontend({
         "type": "agent_status",
         "stage": stage,
         "message": message,
         "url": url or None
     })
-    
     return "Status sent successfully."  
-
-#======================================================================================#
 
 ############# TIER TO TIER MODELS ##############
 
-#======================================================================================#
 
 TOOL = [tavily_search, fetch_page, file_write, file_read, file_editor,update_status]
 
@@ -165,13 +142,3 @@ def create_researcher_on_tier(tier):
         tools=TOOL
     )
 
-
-"""
-
-def create_researcher_on_tier(tier):
-    return Agent(
-        model=models(MODELS[tier], tier),
-        system_prompt=PROMPTS[tier],
-        tools=TOOL
-    )
-"""
