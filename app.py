@@ -22,8 +22,7 @@ from routes.auth_routes import auth_bp
 from extensions import oauth
 from models import db
 from agent import (
-    create_researcher_on_tier,
-    create_research
+    create_researcher_on_tier
 )
 
 app = Flask(__name__)
