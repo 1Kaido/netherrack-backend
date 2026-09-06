@@ -19,6 +19,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
 )
 from routes.auth_routes import auth_bp
+from sse.routes import sse_bp
 from extensions import oauth
 from models import db
 from agent import (
